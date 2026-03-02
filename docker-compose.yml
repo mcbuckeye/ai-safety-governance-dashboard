@@ -1,0 +1,52 @@
+networks:
+  dokploy-network:
+    external: true
+
+volumes:
+  aisafety-pgdata:
+    name: aisafety-pgdata
+
+services:
+  aisafety-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: aisafety
+      POSTGRES_PASSWORD: aisafety
+      POSTGRES_DB: aisafety
+    volumes:
+      - aisafety-pgdata:/var/lib/postgresql/data
+    networks:
+      - dokploy-network
+
+  aisafety-backend:
+    build:
+      context: ./backend
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://aisafety:aisafety@aisafety-db:5432/aisafety
+      JWT_SECRET: supersecretkey
+    depends_on:
+      - aisafety-db
+    networks:
+      - dokploy-network
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  aisafety-frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - aisafety-backend
+    networks:
+      - dokploy-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.aisafety-frontend.rule=Host(`ai-safety-governance-dashboard.machomelab.com`)"
+      - "traefik.http.routers.aisafety-frontend.entrypoints=web"
+      - "traefik.http.services.aisafety-frontend.loadbalancer.server.port=80"
