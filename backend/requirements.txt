@@ -1,8 +1,8 @@
 fastapi
 uvicorn[standard]
 sqlalchemy
-alembic
 psycopg2-binary
 bcrypt
 pyjwt
 python-multipart
+email-validator
