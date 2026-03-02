@@ -21,8 +21,6 @@ services:
   aisafety-backend:
     build:
       context: ./backend
-    ports:
-      - "8000:8000"
     environment:
       DATABASE_URL: postgresql://aisafety:aisafety@aisafety-db:5432/aisafety
       JWT_SECRET: supersecretkey
@@ -39,8 +37,6 @@ services:
   aisafety-frontend:
     build:
       context: ./frontend
-    ports:
-      - "80:80"
     depends_on:
       - aisafety-backend
     networks:
