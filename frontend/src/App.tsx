@@ -1,18 +1,48 @@
-import { useState } from 'react'
+import React from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+import Layout from './components/Layout';
+import ProtectedRoute from './components/ProtectedRoute';
+import Login from './pages/Login';
+import Dashboard from './pages/Dashboard';
+import Models from './pages/Models';
+import ModelDetail from './pages/ModelDetail';
+import Incidents from './pages/Incidents';
+import Policies from './pages/Policies';
+import Alerts from './pages/Alerts';
+import AuditLog from './pages/AuditLog';
+import Settings from './pages/Settings';
+import Guide from './pages/Guide';
 
-function App() {
+const App: React.FC = () => {
   return (
-    <div className="min-h-screen bg-gray-100">
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">
-          AI Safety Dashboard
-        </h1>
-        <p className="text-gray-600">
-          AI Safety & Governance Dashboard - Coming Soon
-        </p>
-      </div>
-    </div>
-  )
-}
+    <AuthProvider>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route
+          path="/*"
+          element={
+            <ProtectedRoute>
+              <Layout>
+                <Routes>
+                  <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                  <Route path="/dashboard" element={<Dashboard />} />
+                  <Route path="/models" element={<Models />} />
+                  <Route path="/models/:id" element={<ModelDetail />} />
+                  <Route path="/incidents" element={<Incidents />} />
+                  <Route path="/policies" element={<Policies />} />
+                  <Route path="/alerts" element={<Alerts />} />
+                  <Route path="/audit" element={<AuditLog />} />
+                  <Route path="/settings" element={<Settings />} />
+                  <Route path="/guide" element={<Guide />} />
+                </Routes>
+              </Layout>
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+    </AuthProvider>
+  );
+};
 
-export default App
+export default App;
